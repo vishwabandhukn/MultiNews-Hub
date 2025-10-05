@@ -16,11 +16,11 @@ const RSS_SOURCES = {
       type: 'rss'
     },
     {
-      id: 'hindustan-times',
-      label: 'Hindustan Times',
-      feedUrl: 'https://www.hindustantimes.com',
+      id: 'deccan-herald',
+      label: 'Deccan Herald',
+      feedUrl: null, // No RSS feed, use scraper
       language: 'english',
-      type: 'rss'
+      type: 'scraper'
     }
   ],
 
@@ -45,16 +45,16 @@ const RSS_SOURCES = {
     {
       id: 'news18-hindi',
       label: 'News18 Hindi',
-      feedUrl: 'https://hindi.news18.com',
+      feedUrl: null, // No RSS feed, use scraper
       language: 'hindi',
-      type: 'rss'
+      type: 'scraper'
     },
     {
       id: 'live-hindustan',
       label: 'Live Hindustan',
-      feedUrl: 'https://www.livehindustan.com',
+      feedUrl: null, // No RSS feed, use scraper
       language: 'hindi',
-      type: 'rss'
+      type: 'scraper'
     },
     {
       id: 'aaj-tak',

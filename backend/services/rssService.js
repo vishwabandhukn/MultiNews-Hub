@@ -7,6 +7,7 @@ import { RSS_SOURCES } from '../constants/sources.js';
 
 // Import updated scrapers
 import { fetchPrajavaniNews, fetchKannadaPrabhaNews } from './prajavaniService.js';
+import { fetchDeccanHeraldNews, fetchNews18HindiNews, fetchLiveHindustanNews } from './additionalScrapers.js';
 
 class RSSService {
   constructor() {
@@ -56,6 +57,9 @@ class RSSService {
       if (type === 'scraper') {
         if (sourceId === 'prajavani') return await this.scrapePrajavani(sourceId, language);
         if (sourceId === 'kannada-prabha') return await this.scrapeKannadaPrabha(sourceId, language);
+        if (sourceId === 'deccan-herald') return await this.scrapeDeccanHerald(sourceId, language);
+        if (sourceId === 'news18-hindi') return await this.scrapeNews18Hindi(sourceId, language);
+        if (sourceId === 'live-hindustan') return await this.scrapeLiveHindustan(sourceId, language);
       }
 
       // Normal RSS feed
@@ -75,30 +79,12 @@ class RSSService {
 
   // --- Custom scraper for Prajavani ---
   async scrapePrajavani(sourceId, language) {
-    const url = 'https://www.prajavani.net/';
     try {
-      const { data: html } = await axios.get(url, {
-        headers: { 'User-Agent': 'MultiLang News Hub Bot 1.0' }
-      });
-      const $ = cheerio.load(html);
-      const items = [];
-
-      // Updated selector for Prajavani homepage
-      $('div.node-teaser').each((_, el) => {
-        const title = $(el).find('a').first().text().trim();
-        const linkPart = $(el).find('a').first().attr('href');
-        const link = linkPart ? 'https://www.prajavani.net' + linkPart : null;
-        const description = $(el).find('p').first().text().trim();
-
-        if (title && link) {
-          items.push(this.normalizeItem({ title, link, description }, sourceId, language));
-        }
-      });
-
-      await this.saveItems(items);
-      console.log(`✅ Scraped ${items.length} items from Prajavani`);
-      return items;
-
+      const scrapedItems = await fetchPrajavaniNews();
+      const normalizedItems = scrapedItems.map(item => this.normalizeItem(item, sourceId, language));
+      await this.saveItems(normalizedItems);
+      console.log(`✅ Scraped ${normalizedItems.length} items from Prajavani`);
+      return normalizedItems;
     } catch (err) {
       console.error('❌ Error scraping Prajavani:', err.message);
       return [];
@@ -107,32 +93,56 @@ class RSSService {
 
   // --- Custom scraper for Kannada Prabha ---
   async scrapeKannadaPrabha(sourceId, language) {
-    const url = 'https://www.kannadaprabha.com/';
     try {
-      const { data: html } = await axios.get(url, {
-        headers: { 'User-Agent': 'MultiLang News Hub Bot 1.0' }
-      });
-      const $ = cheerio.load(html);
-      const items = [];
-
-      // Selector for Kannada Prabha homepage
-      $('div.node-teaser').each((_, el) => {
-        const title = $(el).find('a').first().text().trim();
-        const linkPart = $(el).find('a').first().attr('href');
-        const link = linkPart ? 'https://www.kannadaprabha.com' + linkPart : null;
-        const description = $(el).find('p').first().text().trim();
-
-        if (title && link) {
-          items.push(this.normalizeItem({ title, link, description }, sourceId, language));
-        }
-      });
-
-      await this.saveItems(items);
-      console.log(`✅ Scraped ${items.length} items from Kannada Prabha`);
-      return items;
-
+      const scrapedItems = await fetchKannadaPrabhaNews();
+      const normalizedItems = scrapedItems.map(item => this.normalizeItem(item, sourceId, language));
+      await this.saveItems(normalizedItems);
+      console.log(`✅ Scraped ${normalizedItems.length} items from Kannada Prabha`);
+      return normalizedItems;
     } catch (err) {
       console.error('❌ Error scraping Kannada Prabha:', err.message);
+      return [];
+    }
+  }
+
+  // --- Custom scraper for Deccan Herald ---
+  async scrapeDeccanHerald(sourceId, language) {
+    try {
+      const scrapedItems = await fetchDeccanHeraldNews();
+      const normalizedItems = scrapedItems.map(item => this.normalizeItem(item, sourceId, language));
+      await this.saveItems(normalizedItems);
+      console.log(`✅ Scraped ${normalizedItems.length} items from Deccan Herald`);
+      return normalizedItems;
+    } catch (err) {
+      console.error('❌ Error scraping Deccan Herald:', err.message);
+      return [];
+    }
+  }
+
+  // --- Custom scraper for News18 Hindi ---
+  async scrapeNews18Hindi(sourceId, language) {
+    try {
+      const scrapedItems = await fetchNews18HindiNews();
+      const normalizedItems = scrapedItems.map(item => this.normalizeItem(item, sourceId, language));
+      await this.saveItems(normalizedItems);
+      console.log(`✅ Scraped ${normalizedItems.length} items from News18 Hindi`);
+      return normalizedItems;
+    } catch (err) {
+      console.error('❌ Error scraping News18 Hindi:', err.message);
+      return [];
+    }
+  }
+
+  // --- Custom scraper for Live Hindustan ---
+  async scrapeLiveHindustan(sourceId, language) {
+    try {
+      const scrapedItems = await fetchLiveHindustanNews();
+      const normalizedItems = scrapedItems.map(item => this.normalizeItem(item, sourceId, language));
+      await this.saveItems(normalizedItems);
+      console.log(`✅ Scraped ${normalizedItems.length} items from Live Hindustan`);
+      return normalizedItems;
+    } catch (err) {
+      console.error('❌ Error scraping Live Hindustan:', err.message);
       return [];
     }
   }
